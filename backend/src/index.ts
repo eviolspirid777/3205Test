@@ -170,7 +170,6 @@ const analyticsHandler: RequestHandler = async (req, res) => {
 const shortUrlHandler: RequestHandler = async (req, res) => {
   try {
     const shortUrl = req.params.shortUrl;
-    console.log(req.params)
     const url = await prisma.url.findUnique({
       where: { shortUrl },
     });
