@@ -80,16 +80,16 @@ http://localhost
 ## Технологии
 
 - Frontend:
-  - React
-  - TypeScript
-  - Vite
+    - React
+    - TypeScript
+    - Vite
 
 - Backend:
-  - Express
-  - TypeScript
-  - Prisma
-  - PostgreSQL
+    - Express
+    - TypeScript
+    - Prisma
+    - PostgreSQL
 
 - DevOps:
-  - Docker
-  - Docker Compose
+    - Docker
+    - Docker Compose
