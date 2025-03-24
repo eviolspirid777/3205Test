@@ -1,25 +1,95 @@
-# 3205 Тестовое задание #
+# 3205 Тестовое задание
 
-## Проект разбит на две папки: ##
-- backend
-- frontend
+Сервис для сокращения длинных URL-адресов с использованием React (TypeScript) и Express (TypeScript).
 
-### FRONTEND ###
-- Заходим в папку /frontend
-- Прописываем команду npm install
-- Запускаем локальный сервер npm run dev
-- Переходим по адресу localhost:3000
+## Структура проекта
 
-### BACKEND ###
-- Заходим в папку /backend
-- Проверяем файл .env (прописываем актуальную строку подключения к бд postgres и порт)
-- Прописываем команду npm install
-- Запускаем локальный сервер npm run dev
+Проект состоит из двух основных частей:
+- `frontend/` - React приложение
+- `backend/` - Express сервер
 
-### Деплой приложения ###
-- Переходим в корень проекта
-- Собираем проект docker compose build
-- Разворачиваем контейнеры docker compose up -d
-- Подключаемся по локальному адресу(адресу компьютера). example: localhost:80
+## Локальный запуск
 
-P.s. База данных разворачивается по порту 5432, сервер по порту 3000, клиентское приложение по порту 80(порт можно опустить при обращении в браузере)
+### Frontend
+
+1. Перейдите в директорию frontend:
+```bash
+cd frontend
+```
+
+2. Установите зависимости:
+```bash
+npm install
+```
+
+3. Запустите сервер разработки:
+```bash
+npm run dev
+```
+
+4. Откройте приложение в браузере:
+```
+http://localhost:3000
+```
+
+### Backend
+
+1. Перейдите в директорию backend:
+```bash
+cd backend
+```
+
+2. Создайте файл `.env` и настройте подключение к базе данных:
+```env
+DATABASE_URL="postgresql://postgres:94monizi@localhost:5432/url_shortener?schema=public"
+```
+
+3. Установите зависимости:
+```bash
+npm install
+```
+
+4. Запустите сервер разработки:
+```bash
+npm run dev
+```
+
+## Docker развертывание
+
+1. Соберите Docker образы:
+```bash
+docker-compose build
+```
+
+2. Запустите контейнеры:
+```bash
+docker-compose up -d
+```
+
+3. Приложение будет доступно по адресу:
+```
+http://localhost
+```
+
+## Ссылки
+
+- Frontend: `http://localhost:80`
+- Backend API: `http://localhost:3000`
+- PostgreSQL: `localhost:5432`
+
+## Технологии
+
+- Frontend:
+  - React
+  - TypeScript
+  - Vite
+
+- Backend:
+  - Express
+  - TypeScript
+  - Prisma
+  - PostgreSQL
+
+- DevOps:
+  - Docker
+  - Docker Compose
