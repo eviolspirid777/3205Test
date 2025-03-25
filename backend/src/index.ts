@@ -1,12 +1,17 @@
 import express, { Express, RequestHandler } from 'express';
 import prisma from './prisma';
 import moment from 'moment';
-import type { UrlModelType } from "../types/DbModels";
+import cors from "cors";
+import type { UrlModelType } from "./types/DbModels";
 
 const app: Express = express();
 const port = process.env.PORT;
 
 app.use(express.json());
+app.use(cors({
+  origin: "http://localhost:80",
+  methods: ["GET", "POST", "DELETE"],
+}));
 
 type ShortenRequestBody = {
   originalUrl: string,

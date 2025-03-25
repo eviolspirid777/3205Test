@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance } from "axios";
 import { DeleteAddressResponse, GetAnalyticResponse, getUrlsType, PostAddressRequest, PostAddressResponse } from "../types/ApiClientTypes";
 
-const BASE_URL_PATH = "http://localhost:3000";
+const BASE_URL_PATH = "http://localhost:3001";
 
 class ApiClient {
   private client: AxiosInstance;

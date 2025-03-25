@@ -4,7 +4,7 @@ import { Descriptions, Modal } from "antd"
 import { apiClient } from "../../../../api/apiClient"
 import { GetAnalyticResponse } from "../../../../types/ApiClientTypes"
 
-import styles from "./AnalyticsModal.module.scss"
+// import styles from "./AnalyticsModal.module.scss"
 
 type AnalyticsModalType = {
   shortUrl: string,
