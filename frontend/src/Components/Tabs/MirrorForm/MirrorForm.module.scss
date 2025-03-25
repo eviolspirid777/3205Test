@@ -1,0 +1,12 @@
+.form-container {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+  height: 90vh;
+}
+
+.submit-button {
+  align-self: flex-end;
+  width: 100%;
+}

@@ -1,18 +1,24 @@
-import { useState } from 'react'
+import { Tabs, TabsProps } from 'antd';
+import { MirrorForm } from './Components/Tabs/MirrorForm/MirrorForm';
+import { MirrorTable } from './Components/Tabs/MirrorTable/MirrorTable';
+
+const items: TabsProps['items'] = [
+  {
+    key: '1',
+    label: 'Добавление зеркала',
+    children: <MirrorForm />,
+  },
+  {
+    key: '2',
+    label: 'Таблица зеркал',
+    children: <MirrorTable />,
+  }
+];
 
 export const App = () => {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        { count }
-      </div>
-      <button
-        onClick={setCount.bind(null, (prevCount) => prevCount + 1)}
-      >
-        Click me
-      </button>
-    </>
+    <Tabs
+      items={items}
+    />
   )
 }

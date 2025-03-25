@@ -49,7 +49,17 @@ DATABASE_URL="postgresql://postgres:94monizi@localhost:5432/url_shortener?schema
 npm install
 ```
 
-4. Запустите сервер разработки:
+4. Проциниализируйте prisma:
+```bash
+npx prisma init
+```
+
+5. Сгенерируйте клиентский код:
+```bash
+npx prisma generate
+```
+
+6. Запустите сервер разработки:
 ```bash
 npm run dev
 ```

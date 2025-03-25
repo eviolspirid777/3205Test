@@ -1,18 +1,26 @@
 import express, { Express, RequestHandler } from 'express';
 import prisma from './prisma';
+import moment from 'moment';
+import type { UrlModelType } from "../types/DbModels";
 
 const app: Express = express();
 const port = process.env.PORT;
 
 app.use(express.json());
 
-app.post("/shorten", async (req, res) => {
+type ShortenRequestBody = {
+  originalUrl: string,
+  expiresAt: Date,
+  alias: string
+}
+
+const handlePostUrl: RequestHandler = async (req, res) => {
   try {
     const {
       originalUrl,
       expiresAt,
       alias,
-    } = req.body;
+    } = req.body as ShortenRequestBody;
 
     if (!originalUrl) {
       return res
@@ -34,6 +42,7 @@ app.post("/shorten", async (req, res) => {
       const existingUrl = await prisma.url.findUnique({
         where: { alias },
       });
+
       if (existingUrl) {
         return res
                 .status(400)
@@ -64,11 +73,11 @@ app.post("/shorten", async (req, res) => {
         message: (error as Error).message
       });
   }
-});
+}
 
 const infoHandler: RequestHandler = async (req, res) => {
   try {
-    const shortUrl = req.params.shortUrl;
+    const shortUrl = req.params.shortUrl as string;
     const url = await prisma.url.findUnique({
       where: { shortUrl },
       select: {
@@ -98,7 +107,7 @@ const infoHandler: RequestHandler = async (req, res) => {
 
 const deleteHandler: RequestHandler = async (req, res) => {
   try {
-    const shortUrl = req.params.shortUrl;
+    const shortUrl = req.params.shortUrl as string;
     
     const url = await prisma.url.findUnique({
       where: { shortUrl },
@@ -133,7 +142,7 @@ const deleteHandler: RequestHandler = async (req, res) => {
 
 const analyticsHandler: RequestHandler = async (req, res) => {
   try {
-    const shortUrl = req.params.shortUrl;
+    const shortUrl = req.params.shortUrl as string;
     const url = await prisma.url.findUnique({
       where: { shortUrl },
       include: {
@@ -156,7 +165,7 @@ const analyticsHandler: RequestHandler = async (req, res) => {
 
     res.json({
       clickCount: url.clickCount,
-      lastIps: url.analytics.map(analytic => analytic.ipAddress),
+      lastIps: url.analytics.map((analytic: any) => analytic.ipAddress),
     });
   } catch (error) {
     res
@@ -169,7 +178,7 @@ const analyticsHandler: RequestHandler = async (req, res) => {
 
 const shortUrlHandler: RequestHandler = async (req, res) => {
   try {
-    const shortUrl = req.params.shortUrl;
+    const shortUrl = req.params.shortUrl as string;
     const url = await prisma.url.findUnique({
       where: { shortUrl },
     });
@@ -213,10 +222,58 @@ const shortUrlHandler: RequestHandler = async (req, res) => {
   }
 };
 
+const shortUrlsHandler: RequestHandler = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page as string);
+    const limit = parseInt(req.query.limit as string);
+
+    const skip = (page - 1) * limit;
+
+    const total = await prisma.url.count();
+
+    const urls: UrlModelType[]  = await prisma.url.findMany({
+      select: {
+        id: true,
+        shortUrl: true,
+        originalUrl: true,
+        alias: true,
+        expiresAt: true,
+      },
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const formattedData = urls.map((url) => ({
+      key: url.id,
+      shortUrl: url.shortUrl,
+      originalUrl: url.originalUrl,
+      alias: url.alias || "-",
+      expiresAt: url.expiresAt
+        ? moment(url.expiresAt).format("YYYY-MM-DD HH:mm:ss")
+        : "Нет срока истечения",
+    }));
+
+    res.json({
+      total,
+      data: formattedData,
+    });
+  } catch (error) {
+    console.error("Ошибка при получении списка URL:", error);
+    res.status(500).json({
+      message: (error as Error).message,
+    });
+  }
+}
+
+app.post("/shorten", handlePostUrl);
 app.get('/info/:shortUrl', infoHandler);
 app.delete('/delete/:shortUrl', deleteHandler);
 app.get('/analytics/:shortUrl', analyticsHandler);
 app.get('/:shortUrl', shortUrlHandler);
+app.get("/urls", shortUrlsHandler);
 
 app.listen(port, () => {
   console.log(`Сервер запущен на порту ${port}`);
