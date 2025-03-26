@@ -1,5 +1,5 @@
 import { Button, DatePicker, Form, Input } from "antd"
-import { useState } from "react";
+import { FC } from "react";
 import { apiClient } from "../../../../api/apiClient";
 import moment from "moment";
 
@@ -12,8 +12,13 @@ type FormValues = {
   alias: string,
 };
 
-export const MirrorForm = () => {
-  const [, setShortUrl] = useState<string>();
+type MirrorFormProps = {
+  setIsUpdated: () => void
+}
+
+export const MirrorForm: FC<MirrorFormProps> = ({
+  setIsUpdated
+}) => {
   const [form] = useForm();
 
   const submitForm = async (values: FormValues) => {
@@ -37,11 +42,13 @@ export const MirrorForm = () => {
         expiresAt: combinedDateTime,
       });
 
-      window.alert("Зеркало успешно создано!")
+      window.alert(`Зеркало успешно создано!\nURL: ${data.shortUrl}`)
   
-      setShortUrl(data.shortUrl);
+      setIsUpdated();
+      form.resetFields();
     } catch (error) {
       console.error('Ошибка при отправке формы:', error);
+      window.alert(error)
     }
   };
 
