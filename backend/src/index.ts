@@ -174,6 +174,7 @@ const analyticsHandler: RequestHandler = async (req, res) => {
 
     res.json({
       clickCount: url.clickCount,
+      //TODO: Добавить ниже получение еще и createdAt, а не только ipAddress
       lastIps: url.analytics.map((analytic: any) => analytic.ipAddress),
     });
   } catch (error) {

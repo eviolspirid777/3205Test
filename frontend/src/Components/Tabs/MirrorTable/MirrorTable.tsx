@@ -54,6 +54,15 @@ export const MirrorTable = () => {
     setOpen(true);
   };
 
+  const handleDeleteUrl = async (record: DataType) => {
+    try {
+      await apiClient.deleteAddressInformation(record.shortUrl)
+      setUrls(prev => prev && ({...prev, data: prev?.data.filter(item => item.shortUrl !== record.shortUrl)}))
+    } catch(ex) {
+      console.error(ex)
+    }
+  };
+
   const handleRedirect = async (shortUrl: string) => {
     window.location.href = `${BASE_URL_PATH}/${shortUrl}`;
   };
@@ -101,9 +110,14 @@ export const MirrorTable = () => {
       dataIndex: "button",
       key: "button",
       render: (_, record) => (
-        <Button onClick={() => handleRowClick(record)}>
-          Аналитика
-        </Button>
+        <>
+          <Button onClick={handleRowClick.bind(null, record)}>
+            Аналитика
+          </Button>
+          <Button onClick={handleDeleteUrl.bind(null, record)}>
+            Удалить
+          </Button>
+        </>
       )
     }
   ];
