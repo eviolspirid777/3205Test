@@ -3,12 +3,7 @@ import prisma from './prisma';
 import moment from 'moment';
 import cors from "cors";
 import type { UrlModelType } from "./types/DbModels";
-
-type ShortenRequestBody = {
-  originalUrl: string,
-  expiresAt: Date,
-  alias: string
-}
+import { ShortenRequestBody } from './types/RequestBodies';
 
 const app: Express = express();
 const port = process.env.PORT;
