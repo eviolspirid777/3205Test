@@ -1,9 +1,10 @@
-import { Button, DatePicker, Form, Input, message } from "antd"
+import { Button, DatePicker, Form, Input } from "antd"
 import { useState } from "react";
 import { apiClient } from "../../../../api/apiClient";
 import moment from "moment";
 
 import styles from "./MirrorForm.module.scss"
+import { useForm } from "antd/es/form/Form";
 
 type FormValues = {
   originalUrl: string;
@@ -13,6 +14,7 @@ type FormValues = {
 
 export const MirrorForm = () => {
   const [, setShortUrl] = useState<string>();
+  const [form] = useForm();
 
   const submitForm = async (values: FormValues) => {
     try {
@@ -24,14 +26,18 @@ export const MirrorForm = () => {
       }
 
       const combinedDateTime = date.format('YYYY-MM-DDTHH:mm:ss');
-      
-      message.success("Успешно создана короткая ссылка!")
 
+      let convertedUrl = originalUrl;
+      if(!convertedUrl.includes("https://") || !convertedUrl.includes("http://")) {
+        convertedUrl = `https://${convertedUrl}`
+      }
       const { data } = await apiClient.postAddress({
-        originalUrl,
+        originalUrl: convertedUrl,
         alias,
         expiresAt: combinedDateTime,
       });
+
+      window.alert("Зеркало успешно создано!")
   
       setShortUrl(data.shortUrl);
     } catch (error) {
@@ -46,6 +52,7 @@ export const MirrorForm = () => {
       <h1>Формирование зеркала</h1>
       <Form
         onFinish={submitForm}
+        form={form}
         layout='vertical'
       >
         <Form.Item

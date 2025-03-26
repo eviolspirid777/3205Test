@@ -1,8 +1,8 @@
 import axios, { type AxiosInstance } from "axios";
 import { DeleteAddressResponse, GetAnalyticResponse, getUrlsType, PostAddressRequest, PostAddressResponse } from "../types/ApiClientTypes";
 
-const BASE_URL_PATH = "http://localhost:3001";
-
+// const BASE_URL_PATH = "http://localhost:3001";
+export const BASE_URL_PATH = "http://localhost:3000";
 class ApiClient {
   private client: AxiosInstance;
   
@@ -41,7 +41,7 @@ class ApiClient {
   }
 
   async getUrls(limit: number, page: number) {
-    const response = await this.client.get<getUrlsType>(`${BASE_URL_PATH}/urls`, {
+    const response = await this.client.get<getUrlsType>(`${BASE_URL_PATH}/urls/full-info`, {
       params: {
         page,
         limit,

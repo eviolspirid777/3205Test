@@ -1,8 +1,9 @@
-import { Table, TableProps } from "antd";
+import { Button, Table, TableProps } from "antd";
 import { useEffect, useState } from "react";
 import { getUrlsType } from "../../../../types/ApiClientTypes";
-import { apiClient } from "../../../../api/apiClient";
+import { apiClient, BASE_URL_PATH } from "../../../../api/apiClient";
 import moment from "moment";
+import { AnalyticsModal } from "../../Modal/Analytics/AnalyticsModal";
 
 interface DataType {
   key: number;
@@ -17,38 +18,15 @@ type PagePaggination = {
   page: number
 }
 
-const columns: TableProps<DataType>['columns'] = [
-  {
-    title: 'Зеркало',
-    dataIndex: 'shortUrl',
-    key: 'shortUrl',
-  },
-  {
-    title: 'Полный адрес',
-    dataIndex: 'originalUrl',
-    key: 'originalUrl',
-  },
-  {
-    title: 'Псевдоним',
-    dataIndex: 'alias',
-    key: 'alias',
-  },
-  {
-    title: 'Истекает',
-    dataIndex: 'expiresAt',
-    key: 'expiresAt',
-    render: (value: string) => moment(value, "YYYY-MM-DD HH:mm:ss").isValid()
-            ? moment(value, "YYYY-MM-DD HH:mm:ss").fromNow()
-            : value,
-  },
-];
-
 export const MirrorTable = () => {
-  const [ urls, setUrls ] = useState<getUrlsType>();
-  const [ pagePaggination, setPagePaggination ] = useState<PagePaggination>({
+  const [urls, setUrls] = useState<getUrlsType>();
+  const [pagePaggination, setPagePaggination] = useState<PagePaggination>({
     page: 1,
     limit: 10
   });
+
+  const [open, setOpen] = useState(false);
+  const [shortUrl, setShortUrl] = useState<string>();
 
   useEffect(() => {
     const getData = async () => {
@@ -71,17 +49,83 @@ export const MirrorTable = () => {
     }));
   };
 
+  const handleRowClick = (record: DataType) => {
+    setShortUrl(record.shortUrl);
+    setOpen(true);
+  };
+
+  const handleRedirect = async (shortUrl: string) => {
+    window.location.href = `${BASE_URL_PATH}/${shortUrl}`;
+  };
+
+  const handleStraightLink = (address: string) => { 
+    window.open(`https://${address}`, '_blank');
+  };
+
+  const columns: TableProps<DataType>['columns'] = [
+    {
+      title: 'Зеркало',
+      dataIndex: 'shortUrl',
+      key: 'shortUrl',
+      render: (value: string, record: DataType) => (
+        <Button type="link" onClick={() => handleRedirect(record.shortUrl)}>
+          {value}
+        </Button>
+      )
+    },
+    {
+      title: 'Полный адрес',
+      dataIndex: 'originalUrl',
+      key: 'originalUrl',
+      render: (value: string) => (
+        <Button type="link" onClick={() => handleStraightLink(value)}>
+          {value}
+        </Button>
+      )
+    },
+    {
+      title: 'Псевдоним',
+      dataIndex: 'alias',
+      key: 'alias',
+    },
+    {
+      title: 'Истекает',
+      dataIndex: 'expiresAt',
+      key: 'expiresAt',
+      render: (value: string) => moment(value, "YYYY-MM-DD HH:mm:ss").isValid()
+        ? moment(value, "YYYY-MM-DD HH:mm:ss").fromNow()
+        : value,
+    },
+    {
+      title: "",
+      dataIndex: "button",
+      key: "button",
+      render: (_, record) => (
+        <Button onClick={() => handleRowClick(record)}>
+          Аналитика
+        </Button>
+      )
+    }
+  ];
+
   return (
-    <Table
-      columns={columns}
-      dataSource={urls?.data}
-      pagination={{
-        current: pagePaggination.page,
-        pageSize: pagePaggination.limit,
-        total: urls?.total,
-        onChange: handlePageChange,
-      }}
-      rowKey={(record) => record.key.toString()}
-    />
+    <>
+      <Table
+        columns={columns}
+        dataSource={urls?.data}
+        pagination={{
+          current: pagePaggination.page,
+          pageSize: pagePaggination.limit,
+          total: urls?.total,
+          onChange: handlePageChange,
+        }}
+        rowKey={(record) => record.key.toString()}
+      />
+      <AnalyticsModal
+        open={open}
+        setOpen={() => setOpen(false)}
+        shortUrl={shortUrl}
+      />
+    </>
   )
 }

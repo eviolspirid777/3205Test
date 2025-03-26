@@ -15,19 +15,20 @@ services:
     ports:
       - "3001:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:94monizi@db:5432/url_shortener?schema=public
+      - DATABASE_URL=postgresql://postgres:94monizi@postgres-db:5435/url_shortener?schema=public
     depends_on:
       - db
 
   db:
     image: postgres:15-alpine
+    container_name: postgres-db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
     ports:
-      - "5432:5432"
+      - "5435:5433"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=94monizi

@@ -4,10 +4,10 @@ import { Descriptions, Modal } from "antd"
 import { apiClient } from "../../../../api/apiClient"
 import { GetAnalyticResponse } from "../../../../types/ApiClientTypes"
 
-// import styles from "./AnalyticsModal.module.scss"
+import styles from "./AnalyticsModal.module.scss"
 
 type AnalyticsModalType = {
-  shortUrl: string,
+  shortUrl: string | undefined,
   open: boolean,
   setOpen: () => void,
 }
@@ -22,8 +22,10 @@ export const AnalyticsModal: FC<AnalyticsModalType> = ({
   useEffect(() => {
     const getAnalytics = async () => {
       try {
-        const response = await apiClient.getAnalytics(shortUrl);
-        setAnalytics(response.data)
+        if(shortUrl) {
+          const response = await apiClient.getAnalytics(shortUrl);
+          setAnalytics(response.data)
+        }
       } catch (ex) {
         console.error(ex)
       }
@@ -42,22 +44,28 @@ export const AnalyticsModal: FC<AnalyticsModalType> = ({
         onCancel={setOpen}
       >
         <Descriptions
-          title={shortUrl}
+          title={`Короткий url - ${shortUrl}`}
+          className={styles["descriptions-block"]}
         >
           <Descriptions.Item
-            label={analytics?.clickCount}
+            label="Число переходов"
           >
             {analytics?.clickCount}
           </Descriptions.Item>
-          {
-            analytics?.lastIps.map((ip, index) => 
-              <Descriptions.Item
-                key={index}
-                label={index}
-              >
-                {ip}
-              </Descriptions.Item>)
-          }
+          <Descriptions.Item
+            className={styles["descriptions-block-ip-addresses-block"]}
+          >
+            {
+              analytics?.lastIps.map((ip, index) => 
+                <Descriptions.Item
+                  className={styles["descriptions-block-ip-addresses-block-item"]}
+                  label={index}
+                >
+                  {ip}
+                </Descriptions.Item>
+              )
+            }
+          </Descriptions.Item>
         </Descriptions>
       </Modal>,
       document.body

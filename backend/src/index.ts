@@ -4,20 +4,29 @@ import moment from 'moment';
 import cors from "cors";
 import type { UrlModelType } from "./types/DbModels";
 
-const app: Express = express();
-const port = process.env.PORT;
-
-app.use(express.json());
-app.use(cors({
-  origin: "http://localhost:80",
-  methods: ["GET", "POST", "DELETE"],
-}));
-
 type ShortenRequestBody = {
   originalUrl: string,
   expiresAt: Date,
   alias: string
 }
+
+const app: Express = express();
+const port = process.env.PORT;
+
+app.use(express.json());
+app.use(cors({
+  origin: [
+    "http://localhost",
+    "http://frontend",
+    "http://localhost:80",
+    "http://localhost:5173",
+  ],
+  methods: ["GET", "POST", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+
+app.options("*", cors());
 
 const handlePostUrl: RequestHandler = async (req, res) => {
   try {
@@ -189,19 +198,11 @@ const shortUrlHandler: RequestHandler = async (req, res) => {
     });
 
     if (!url) {
-      return res
-              .status(404)
-              .json({
-                message: "URL не найден"
-              });
+      return res.status(404).json({ message: "URL не найден" });
     }
 
     if (url.expiresAt && url.expiresAt < new Date()) {
-      return res
-              .status(410)
-              .json({
-                message: "Срок действия ссылки истек"
-              });
+      return res.status(410).json({ message: "Срок действия ссылки истек" });
     }
 
     await prisma.$transaction([
@@ -217,13 +218,14 @@ const shortUrlHandler: RequestHandler = async (req, res) => {
       }),
     ]);
 
-    res.redirect(url.originalUrl);
+    let targetUrl = url.originalUrl;
+    if (!/^https?:\/\//i.test(targetUrl)) {
+      targetUrl = `http://${targetUrl}`;
+    }
+
+    res.status(302).setHeader('Location', targetUrl).end();
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: (error as Error).message
-      });
+    res.status(500).json({ message: (error as Error).message });
   }
 };
 
@@ -273,12 +275,12 @@ const shortUrlsHandler: RequestHandler = async (req, res) => {
   }
 }
 
-app.post("/shorten", handlePostUrl);
+app.post('/shorten', handlePostUrl);
 app.get('/info/:shortUrl', infoHandler);
 app.delete('/delete/:shortUrl', deleteHandler);
 app.get('/analytics/:shortUrl', analyticsHandler);
 app.get('/:shortUrl', shortUrlHandler);
-app.get("/urls", shortUrlsHandler);
+app.get('/urls/full-info', shortUrlsHandler);
 
 app.listen(port, () => {
   console.log(`Сервер запущен на порту ${port}`);
